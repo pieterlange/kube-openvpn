@@ -9,15 +9,14 @@ podcidr=$4
 
 # Server name is in the form "udp://vpn.example.com:1194"
 if [[ "$serverurl" =~ ^((udp|tcp)://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
-    OVPN_PROTO=${BASH_REMATCH[2]};
-    OVPN_CN=${BASH_REMATCH[3]};
+    OVPN_PROTO=$(echo ${BASH_REMATCH[2]} | tr '[:lower:]' '[:upper:]')
+    OVPN_CN=$(echo ${BASH_REMATCH[3]} | tr '[:upper:]' '[:lower:]')
     OVPN_PORT=${BASH_REMATCH[5]};
 else
     echo "Need to pass in OpenVPN URL in 'proto://fqdn:port' format"
     echo "eg: tcp://my.fully.qualified.domain.com:1194"
     exit 1
 fi
-OVPN_PROTO="${OVPN_PROTO:-tcp}"
 OVPN_PORT="${OVPN_PORT:-1194}"
 
 if [ ! -d pki ]; then
@@ -147,15 +146,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    openvpn: ${OVPN_CN,,}
+    openvpn: ${OVPN_CN}
   name: openvpn-ingress
 spec:
   type: NodePort
   ports:
   - port: 1194
-    protocol: ${OVPN_PROTO^^}
+    protocol: ${OVPN_PROTO}
     targetPort: $OVPN_PORT
   selector:
-    openvpn: ${OVPN_CN,,}
+    openvpn: ${OVPN_CN}
 ---
 EOSERVICE
