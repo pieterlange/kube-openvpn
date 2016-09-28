@@ -59,7 +59,7 @@ Edit the CCD (client configuration directory) configmap:
 ```
 $ kubectl edit configmap openvpn-ccd
 ```
-Look at the example and add another for the `CLIENTNAME` you added before. Restart the openvpn server (kill the running pod).
+Look at the example and add another for the `CLIENTNAME` you added before. You do not have to restart openvpn but if you're already connected you will need to reconnect to get the static IP.
 
 ![Two-way traffic](kube/routing2.png "Direct access to the client from other kubernetes services!")
 
