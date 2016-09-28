@@ -1,6 +1,9 @@
 kubernetes-openvpn
 ==================
 
+[![Docker Repository on Quay](https://quay.io/repository/plange/openvpn/status "Docker Repository on Quay")](https://quay.io/repository/plange/openvpn)
+[![Docker Repository on Docker Hub](https://img.shields.io/docker/automated/ptlange/openvpn.svg "Docker Repository on Docker Hub")](https://hub.docker.com/r/ptlange/openvpn/)
+
 ## Synopsis
 Simple OpenVPN deployment using native kubernetes semantics. There is no persistent storage, CA management (key storage, cert signing) needs to be done outside of the cluster for now. I think this is better - unless you leave your keys on your dev laptop.
 
@@ -72,5 +75,3 @@ Please file issues on github. PR's are welcomed.
 
 ## Thanks
 I used kylemanna/openvpn extensively for a long time and lend quite a few of his scripts for easing the PKI handling. offlinehacker/openvpn-k8s provided some inspiration as well and showed i can run openvpn without any persistent storage, prompting me to write this collection of scripts.
-
-
