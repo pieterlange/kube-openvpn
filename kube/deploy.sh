@@ -151,9 +151,9 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: 1194
+  - port: ${OVPN_PORT}
     protocol: ${OVPN_PROTO}
-    targetPort: $OVPN_PORT
+    targetPort: 1194
   selector:
     openvpn: ${OVPN_CN}
 ---
