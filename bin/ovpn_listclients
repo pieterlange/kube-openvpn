@@ -1,14 +1,13 @@
 #!/bin/bash
 
-if [ -z "$OPENVPN" ]; then
-    export OPENVPN="$PWD"
-fi
-if ! source "$OPENVPN/ovpn_env.sh"; then
-    echo "Could not source $OPENVPN/ovpn_env.sh."
+# Server name is in the form "udp://vpn.example.com:1194"
+if [[ "$OVPN_SERVER_URL" =~ ^((udp|tcp)://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
+    OVPN_PROTO=${BASH_REMATCH[2]};
+    OVPN_CN=${BASH_REMATCH[3]};
+    OVPN_PORT=${BASH_REMATCH[5]};
+else
+    echo "Need to pass in OVPN_SERVER_URL in 'proto://fqdn:port' format"
     exit 1
-fi
-if [ -z "$EASYRSA_PKI" ]; then
-    export EASYRSA_PKI="$OPENVPN/pki"
 fi
 
 cd "$EASYRSA_PKI"
@@ -25,7 +24,7 @@ for name in issued/*.crt; do
 
     name=${name%.crt}
     name=${name#issued/}
-    if [ "$name" != "$OVPN_CN" ]; then
+    if [ "$name" != "$OVPN_" ]; then
     if [ -e crl.pem ]; then
         if openssl verify -crl_check -CAfile cacheck.pem $path &> /dev/null; then
 	status="VALID"
