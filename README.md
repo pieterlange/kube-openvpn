@@ -13,7 +13,7 @@ The main motivator for this project was having the ability to route service requ
 ## Usage
 First, you need to initialize your PKI infrastructure. Easyrsa is bundled in this container, so this is fairly easy. Replace `OVPN_SERVER_URL` with your endpoint to-be.
 ```
-docker run -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn -ti ptlange/openvpn ovpn_initpki
+$ docker run -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn -ti ptlange/openvpn ovpn_initpki
 ```
 Follow the instructions on screen. Remember (or better: securely store) your secure password for the CA. You are now left with a `pki` folder in your current working directory.
 
@@ -42,8 +42,8 @@ With the pki still in `$PWD/pki` we can create a new VPN user and grab the `.ovp
 
 ```
 # Generate VPN client credentials for CLIENTNAME without password protection; leave 'nopass' out to enter password
-docker run -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa build-client-full CLIENTNAME nopass
-docker run -v $PWD:/etc/openvpn --rm ptlange/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
+$ docker run -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa build-client-full CLIENTNAME nopass
+$ docker run -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn --rm ptlange/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
 ```
 
 `CLIENTNAME.ovpn` can now be used to connect to the cluster and interact with k8s services and pods directly. Whoohoo!
