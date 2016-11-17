@@ -8,7 +8,7 @@ set -e
 
 source /usr/local/bin/func.sh
 
-addArg "--config" "$OPENVPN_CONFIG"
+addArg "--config" "$OVPN_CONFIG"
 
 # Server name is in the form "udp://vpn.example.com:1194"
 if [[ "$OVPN_SERVER_URL" =~ ^((udp|tcp)://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
@@ -50,7 +50,7 @@ OVPN_NETWORK_ROUTE=$(getroute ${OVPN_NETWORK})
 OVPN_K8S_SERVICE_NETWORK_ROUTE=$(getroute $OVPN_K8S_SERVICE_NETWORK)
 OVPN_K8S_POD_NETWORK_ROUTE=$(getroute $OVPN_K8S_POD_NETWORK)
 
-envsubst < $OPENVPN_TEMPLATE > $OPENVPN_CONFIG
+envsubst < $OVPN_TEMPLATE > $OVPN_CONFIG
 
 iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
 
