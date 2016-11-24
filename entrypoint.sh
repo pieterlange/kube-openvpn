@@ -4,11 +4,11 @@ if [ "$DEBUG" == "1" ]; then
     set -x
 fi
 
-set -e
+set -ae
 
 source /usr/local/bin/func.sh
 
-addArg "--config" "$OPENVPN/openvpn.conf"
+addArg "--config" "$OVPN_CONFIG"
 
 # Server name is in the form "udp://vpn.example.com:1194"
 if [[ "$OVPN_SERVER_URL" =~ ^((udp|tcp)://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
@@ -50,13 +50,7 @@ OVPN_NETWORK_ROUTE=$(getroute ${OVPN_NETWORK})
 OVPN_K8S_SERVICE_NETWORK_ROUTE=$(getroute $OVPN_K8S_SERVICE_NETWORK)
 OVPN_K8S_POD_NETWORK_ROUTE=$(getroute $OVPN_K8S_POD_NETWORK)
 
-sed 's|{{OVPN_NETWORK_ROUTE}}|'"${OVPN_NETWORK_ROUTE}"'|' -i "${OVPN_CONFIG}"
-sed 's|{{OVPN_PROTO}}|'"${OVPN_PROTO}"'|' -i "${OVPN_CONFIG}"
-sed 's|{{OVPN_K8S_SERVICE_NETWORK_ROUTE}}|'"${OVPN_K8S_SERVICE_NETWORK_ROUTE}"'|' -i "${OVPN_CONFIG}"
-sed 's|{{OVPN_K8S_POD_NETWORK_ROUTE}}|'"${OVPN_K8S_POD_NETWORK_ROUTE}"'|' -i "${OVPN_CONFIG}"
-sed 's|{{OVPN_K8S_DOMAIN}}|'"${OVPN_K8S_DOMAIN}"'|' -i "${OVPN_CONFIG}"
-sed 's|{{OVPN_K8S_DNS}}|'"${OVPN_K8S_DNS}"'|' -i "${OVPN_CONFIG}"
-sed 's|{{EASYRSA_PKI}}|'"${EASYRSA_PKI}"'|' -i "${OVPN_CONFIG}"
+envsubst < $OVPN_TEMPLATE > $OVPN_CONFIG
 
 iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
 
@@ -94,6 +88,11 @@ if [ -r "$EASYRSA_PKI/crl.pem" ]; then
         chmod 644 "$OPENVPN/crl.pem"
     fi
     addArg "--crl-verify" "$OPENVPN/crl.pem"
+fi
+
+if [ "$DEBUG" == "1" ]; then
+  echo "openvpn.conf:"
+  cat $OVPN_CONFIG
 fi
 
 echo "Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
