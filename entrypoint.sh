@@ -4,7 +4,7 @@ if [ "$DEBUG" == "1" ]; then
     set -x
 fi
 
-set -e
+set -ae
 
 source /usr/local/bin/func.sh
 
