@@ -90,5 +90,10 @@ if [ -r "$EASYRSA_PKI/crl.pem" ]; then
     addArg "--crl-verify" "$OPENVPN/crl.pem"
 fi
 
+if [ "$DEBUG" == "1" ]; then
+  echo "openvpn.conf:"
+  cat $OVPN_CONFIG
+fi
+
 echo "Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
 exec openvpn ${ARGS[@]} ${USER_ARGS[@]}
