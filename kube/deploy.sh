@@ -47,6 +47,8 @@ data:
 ---
 EOSECRETS
 
+kubectl create configmap --namespace=$namespace openvpn-crl --from-file=crl.pem=$PWD/pki/crl.pem
+
 kubectl create --namespace=$namespace -f - <<- EOCONFIGMAP
 apiVersion: v1
 kind: ConfigMap
@@ -102,6 +104,8 @@ spec:
         volumeMounts:
         - mountPath: /etc/openvpn/pki
           name: openvpn-pki
+        - mountPath: /etc/openvpn/crl
+          name: openvpn-crl
         - mountPath: /etc/openvpn/ccd
           name: openvpn-ccd
         env:
@@ -136,6 +140,9 @@ spec:
       - name: openvpn-ccd
         configMap:
           name: openvpn-ccd
+      - name: openvpn-crl
+        configMap:
+          name: openvpn-crl
 ---
 EODEPLOYMENT
 

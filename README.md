@@ -17,6 +17,11 @@ $ docker run -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn -ti 
 ```
 Follow the instructions on screen. Remember (or better: securely store) your secure password for the CA. You are now left with a `pki` folder in your current working directory.
 
+Generate the initial Certificate Revocation List. This file needs to be updated every `$EASYRSA_CRL_DAYS`. All clients will be blocked when this file expires.
+```
+$ docker run -e EASYRSA_CRL_DAYS=180 -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa gen-crl
+```
+
 Deploy the VPN server (namespace needs to exist already):
 ```
 $ ./kube/deploy.sh
