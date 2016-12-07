@@ -18,6 +18,7 @@ ENV OVPN_TEMPLATE $OPENVPN/templates/openvpn.tmpl
 ENV OVPN_CONFIG $OPENVPN/openvpn.conf
 ENV EASYRSA /usr/share/easy-rsa
 ENV EASYRSA_PKI $OPENVPN/pki
+ENV OVPN_DEFROUTE 0
 
 # Some PKI scripts.
 ADD ./bin /usr/local/bin
