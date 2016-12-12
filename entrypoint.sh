@@ -23,7 +23,7 @@ fi
 OVPN_NETWORK="${OVPN_NETWORK:-10.140.0.0/24}"
 OVPN_PROTO="${OVPN_PROTO:-tcp}"
 OVPN_NATDEVICE="${OVPN_NATDEVICE:-eth0}"
-OVPN_K8S_DOMAIN="${OVPN_KUBE_DOMAIN:-svc.cluster.local}"
+OVPN_K8S_DOMAIN="${OVPN_K8S_DOMAIN:-svc.cluster.local}"
 
 if [ ! -d "${EASYRSA_PKI}" ]; then
     echo "PKI directory missing. Did you mount in your Secret?"
