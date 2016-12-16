@@ -72,6 +72,17 @@ data:
 ---
 EOCONFIGMAP
 
+kubectl create --namespace=$namespace -f - <<- EOCONFIGMAP
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openvpn-iptables
+data:
+  portmapping: "28080=10.140.0.20:80"
+---
+EOCONFIGMAP
+
+
 kubectl create --namespace=$namespace -f - <<- EODEPLOYMENT
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -108,6 +119,8 @@ spec:
           name: openvpn-crl
         - mountPath: /etc/openvpn/ccd
           name: openvpn-ccd
+        - mountPath: /etc/openvpn/iptables
+          name: openvpn-iptables
         env:
         - name: PODIPADDR
           valueFrom:
@@ -143,6 +156,9 @@ spec:
       - name: openvpn-crl
         configMap:
           name: openvpn-crl
+      - name: openvpn-iptables
+        configMap:
+          name: openvpn-iptables
 ---
 EODEPLOYMENT
 

@@ -58,20 +58,11 @@ iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUE
 if [ -d "$OPENVPN/ccd" ]; then
     addArg "--client-config-dir" "$OPENVPN/ccd"
 
-    if [ ! -z "$PORTFORWARDS" ]; then
-        subnet=$(echo $OVPN_NETWORK | grep -oE '((1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])\.){3}')
-        # Grab last octet from client static IP's for funky port mapping scheme
-        for client in $(grep 'ifconfig-push' ${OPENVPN}/ccd/* | cut -d' ' -f2 | cut -d'.' -f4); do
-            if [ "$client" -gt "65" ]; then
-                echo "Client configured with static IP outside of mappable range (${client}), skipping"
-                continue
-            fi
-
-            # ports need to be in 000-999 range
-            for port in $PORTFORWARDS; do
-                iptables -t nat -A PREROUTING -p tcp -d $PODIPADDR --dport ${client}${port} -j DNAT --to ${subnet}${client}:${client}${port}
-            done
-        done
+    if [ -f $OVPN_PORTMAPPING ]; then
+      while IFS='=' read port destination; do
+        echo "Routing ${PODIPADDR}:${port} to ${destination}"
+        iptables -t nat -A PREROUTING -p tcp -d $PODIPADDR --dport ${port} -j DNAT --to $destination
+      done < $OVPN_PORTMAPPING
     fi
 fi
 
