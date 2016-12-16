@@ -1,5 +1,4 @@
 #!/bin/bash
-
 if [ "$DEBUG" == "1" ]; then
     set -x
 fi
@@ -58,11 +57,12 @@ iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUE
 if [ -d "$OPENVPN/ccd" ]; then
     addArg "--client-config-dir" "$OPENVPN/ccd"
 
-    if [ -f $OVPN_PORTMAPPING ]; then
-      while IFS='=' read port destination; do
-        echo "Routing ${PODIPADDR}:${port} to ${destination}"
-        iptables -t nat -A PREROUTING -p tcp -d $PODIPADDR --dport ${port} -j DNAT --to $destination
-      done < $OVPN_PORTMAPPING
+    if [ -d ${OVPN_PORTMAPPING} ]; then
+        for port in $(ls -1 ${OVPN_PORTMAPPING}); do
+            destination=$(cat ${OVPN_PORTMAPPING}/${port})
+            echo "Routing ${PODIPADDR}:${port} to ${destination}"
+            iptables -t nat -A PREROUTING -p tcp -d $PODIPADDR --dport ${port} -j DNAT --to $destination
+        done
     fi
 fi
 
