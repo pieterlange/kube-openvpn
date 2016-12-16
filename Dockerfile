@@ -15,7 +15,7 @@ RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >> /etc/apk/reposi
 # Needed by scripts
 ENV OPENVPN /etc/openvpn
 ENV OVPN_TEMPLATE $OPENVPN/templates/openvpn.tmpl
-ENV OVPN_PORTMAPPING $OPENVPN/iptables/portmapping
+ENV OVPN_PORTMAPPING $OPENVPN/iptables
 ENV OVPN_CONFIG $OPENVPN/openvpn.conf
 ENV EASYRSA /usr/share/easy-rsa
 ENV EASYRSA_PKI $OPENVPN/pki

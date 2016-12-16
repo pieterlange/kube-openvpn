@@ -78,7 +78,7 @@ kind: ConfigMap
 metadata:
   name: openvpn-iptables
 data:
-  portmapping: "28080=10.140.0.20:80"
+  20080: "10.140.0.20:80"
 ---
 EOCONFIGMAP
 
