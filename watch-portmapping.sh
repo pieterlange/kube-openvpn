@@ -18,10 +18,10 @@ while true; do
                 dest_port=$(cut -d':' -f2 ${OVPN_PORTMAPPING}/${port})
                 if [ -f ${OVPN_CCD}/${dest_cname} ]; then
                     dest_ip=$(grep 'ifconfig-push' $OVPN_CCD/${dest_cname} | cut -d' ' -f2)
-                    echo "Routing ${PODIPADDR}:${port} to ${dest_ip}:${dest_port} (${dest_cname})"
+                    echo "$(date "+%a %b %d %H:%M:%S %Y") Routing ${PODIPADDR}:${port} to ${dest_ip}:${dest_port} (${dest_cname})"
                     iptables -t nat -A KUBEOPENVPNPORTFORWARD -p tcp -d $PODIPADDR --dport ${port} -j DNAT --to ${dest_ip}:${dest_port}
                 else
-                    echo "ERROR: client configuration for ${dest_cname} not found"
+                    echo "$(date "+%a %b %d %H:%M:%S %Y") ERROR: client configuration for ${dest_cname} not found"
                 fi
             done
 

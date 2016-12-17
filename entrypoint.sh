@@ -79,5 +79,5 @@ if [ $DEBUG ]; then
   cat $OVPN_CONFIG
 fi
 
-echo "Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
+echo "$(date "+%a %b %d %H:%M:%S %Y") Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
 exec openvpn ${ARGS[@]} ${USER_ARGS[@]}
