@@ -50,7 +50,12 @@ OVPN_K8S_POD_NETWORK_ROUTE=$(getroute $OVPN_K8S_POD_NETWORK)
 
 envsubst < $OVPN_TEMPLATE > $OVPN_CONFIG
 
-iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
+if [ $OVPN_DEFROUTE -gt 0 ]; then
+  iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
+else
+  iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $OVPN_K8S_POD_NETWORK -o ${OVPN_NATDEVICE} -j MASQUERADE
+  iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $OVPN_K8S_SERVICE_NETWORK -o ${OVPN_NATDEVICE} -j MASQUERADE
+fi
 
 # Use client configuration directory if it exists.
 if [ -d "$OVPN_CCD" ]; then

@@ -48,7 +48,7 @@ With the pki still in `$PWD/pki` we can create a new VPN user and grab the `.ovp
 ```
 # Generate VPN client credentials for CLIENTNAME without password protection; leave 'nopass' out to enter password
 $ docker run --user=$(id -u) -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa build-client-full CLIENTNAME nopass
-$ docker run --user=$(id -u)-e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn --rm ptlange/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
+$ docker run --user=$(id -u) -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn --rm ptlange/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
 ```
 
 `CLIENTNAME.ovpn` can now be used to connect to the cluster and interact with k8s services and pods directly. Whoohoo!
