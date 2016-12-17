@@ -5,7 +5,7 @@ while true; do
     if [ -d $OVPN_CCD ]; then
 
         if [ -d $OVPN_PORTMAPPING ]; then
-            # Flush any old rules.
+            # Flush any old NAT rules.
             iptables -t nat -F
             for port in $(ls -1 ${OVPN_PORTMAPPING}); do
                 dest_cname=$(cut -d':' -f1 ${OVPN_PORTMAPPING}/${port})
@@ -20,17 +20,17 @@ while true; do
             done
 
             # Done. Block for updates to configmap.
-            inotifywait -e modify -e create -e delete $OVPN_PORTMAPPING
+            inotifywait -qq -e modify -e create -e delete $OVPN_PORTMAPPING
         else
             # Watch $OPENVPN directory for portmapping directory creation
-            inotifywait -e create -qq $OPENVPN
+            inotifywait -qq -e create $OPENVPN
 
             # Give it time to settle
             sleep 60
         fi
     else
         # Watch $OPENVPN directory for client configuration directory creation
-        inotifywait -e create -qq $OPENVPN
+        inotifywait -qq -e create $OPENVPN
 
         # Give it time to settle
         sleep 60
