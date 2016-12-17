@@ -58,19 +58,36 @@ $ docker run -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn --rm
 
 ## Routing back to the client
 
-In order to route cluster traffic back to a service running on the client, we need to assign `CLIENTNAME` a static IP. If you haven't configured an `$OVPN_NETWORK` you need to pick something in the `10.140.0.0/24` range. Keep between `10.140.0.2` and `10.140.0.65` to prevent numbering conflicts. This enables us to route up to 1000 services per client.
+In order to route cluster traffic back to a service running on the client, we need to assign `CLIENTNAME` a static IP. If you have not configured an `$OVPN_NETWORK` you need to pick something in the `10.140.0.0/24` range.
 
 Edit the CCD (client configuration directory) configmap:
 ```
 $ kubectl edit configmap openvpn-ccd
 ```
-Look at the example and add another for the `CLIENTNAME` you added before. You do not have to restart openvpn but if you're already connected you will need to reconnect to get the static IP.
+Look at the example and add another entry for the `CLIENTNAME` you added before. You do not have to restart openvpn but if you are already connected you will need to reconnect to get the static IP.
+
+Next you have to define what port on the openvpn pod to route back to the client. The port forwarding will automatically load after the configmap has been updated.
+```
+$ kubectl edit configmap openvpn-portmapping
+```
 
 ![Two-way traffic](kube/routing2.png "Direct access to the client from other kubernetes services!")
 
-Note:
-  * The port mapping on the VPN server pod is the same on the VPN client.
-  * This means every VPN client needs to be able to configure the port their app runs on (`$ip:$mapped_port`)
+You can now reach the openvpn client! If you want to substitute a kubernetes service for a service running on the client, simply modify the label selector to match your openvpn endpoint address and the `targetPort` just configured in the openvpn-portmapping configmap.
+
+Exampe service definition routing service `myapp` on port 80 to the `example` client's service running on port 80.
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  ports:
+  - port: 80
+    targetPort: 20080
+  selector:
+    openvpn: vpn.my.fqdn
+```
 
 ## Tests
 NONE. See next section.

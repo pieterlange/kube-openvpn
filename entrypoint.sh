@@ -1,7 +1,5 @@
 #!/bin/bash
-if [ "$DEBUG" == "1" ]; then
-    set -x
-fi
+[[ $DEBUG ]] && set -x
 
 set -ae
 
@@ -53,17 +51,12 @@ envsubst < $OVPN_TEMPLATE > $OVPN_CONFIG
 
 iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
 
-# Used for assigning custom configurations (ie static IP addresses) to specific clients
-if [ -d "$OPENVPN/ccd" ]; then
-    addArg "--client-config-dir" "$OPENVPN/ccd"
+# Use client configuration directory if it exists.
+if [ -d "$OVPN_CCD" ]; then
+    addArg "--client-config-dir" "$OVPN_CCD"
 
-    if [ -d ${OVPN_PORTMAPPING} ]; then
-        for port in $(ls -1 ${OVPN_PORTMAPPING}); do
-            destination=$(cat ${OVPN_PORTMAPPING}/${port})
-            echo "Routing ${PODIPADDR}:${port} to ${destination}"
-            iptables -t nat -A PREROUTING -p tcp -d $PODIPADDR --dport ${port} -j DNAT --to $destination
-        done
-    fi
+    # Watch for changes to port translation configmap in the background
+    /sbin/watch-portmapping.sh &
 fi
 
 mkdir -p /dev/net
@@ -81,7 +74,7 @@ if [ -r "$EASYRSA_PKI/crl.pem" ]; then
     addArg "--crl-verify" "$OPENVPN/crl.pem"
 fi
 
-if [ "$DEBUG" == "1" ]; then
+if [ $DEBUG ]; then
   echo "openvpn.conf:"
   cat $OVPN_CONFIG
 fi
