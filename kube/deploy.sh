@@ -58,7 +58,6 @@ data:
   servicecidr: "${servicecidr}"
   podcidr: "${podcidr}"
   serverurl: "${serverurl}"
-  portforwards: "080 443"
 ---
 EOCONFIGMAP
 
@@ -126,11 +125,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        - name: PORTFORWARDS
-          valueFrom:
-            configMapKeyRef:
-              name: openvpn-settings
-              key: portforwards
         - name: OVPN_SERVER_URL
           valueFrom:
             configMapKeyRef:
