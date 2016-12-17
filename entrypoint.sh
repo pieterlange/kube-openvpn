@@ -1,8 +1,5 @@
 #!/bin/bash
-
-if [ "$DEBUG" == "1" ]; then
-    set -x
-fi
+[[ $DEBUG ]] && set -x
 
 set -ae
 
@@ -54,25 +51,12 @@ envsubst < $OVPN_TEMPLATE > $OVPN_CONFIG
 
 iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
 
-# Used for assigning custom configurations (ie static IP addresses) to specific clients
-if [ -d "$OPENVPN/ccd" ]; then
-    addArg "--client-config-dir" "$OPENVPN/ccd"
+# Use client configuration directory if it exists.
+if [ -d "$OVPN_CCD" ]; then
+    addArg "--client-config-dir" "$OVPN_CCD"
 
-    if [ ! -z "$PORTFORWARDS" ]; then
-        subnet=$(echo $OVPN_NETWORK | grep -oE '((1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])\.){3}')
-        # Grab last octet from client static IP's for funky port mapping scheme
-        for client in $(grep 'ifconfig-push' ${OPENVPN}/ccd/* | cut -d' ' -f2 | cut -d'.' -f4); do
-            if [ "$client" -gt "65" ]; then
-                echo "Client configured with static IP outside of mappable range (${client}), skipping"
-                continue
-            fi
-
-            # ports need to be in 000-999 range
-            for port in $PORTFORWARDS; do
-                iptables -t nat -A PREROUTING -p tcp -d $PODIPADDR --dport ${client}${port} -j DNAT --to ${subnet}${client}:${client}${port}
-            done
-        done
-    fi
+    # Watch for changes to port translation configmap in the background
+    /sbin/watch-portmapping.sh &
 fi
 
 mkdir -p /dev/net
@@ -90,7 +74,7 @@ if [ -r "$EASYRSA_PKI/crl.pem" ]; then
     addArg "--crl-verify" "$OPENVPN/crl.pem"
 fi
 
-if [ "$DEBUG" == "1" ]; then
+if [ $DEBUG ]; then
   echo "openvpn.conf:"
   cat $OVPN_CONFIG
 fi
