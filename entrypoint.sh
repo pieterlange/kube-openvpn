@@ -1,5 +1,5 @@
 #!/bin/bash
-[[ $DEBUG ]] && set -x
+[[ $DEBUG ]] && set -x && OVPN_VERB=${OVPN_VERB:-5}
 
 set -ae
 
@@ -21,6 +21,7 @@ OVPN_NETWORK="${OVPN_NETWORK:-10.140.0.0/24}"
 OVPN_PROTO="${OVPN_PROTO:-tcp}"
 OVPN_NATDEVICE="${OVPN_NATDEVICE:-eth0}"
 OVPN_K8S_DOMAIN="${OVPN_K8S_DOMAIN:-svc.cluster.local}"
+OVPN_VERB=${OVPN_VERB:-3}
 
 if [ ! -d "${EASYRSA_PKI}" ]; then
     echo "PKI directory missing. Did you mount in your Secret?"
