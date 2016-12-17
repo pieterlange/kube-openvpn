@@ -2,6 +2,8 @@
 [ $DEBUG ] && set -x
 
 iptables -t nat -N KUBEOPENVPNPORTFORWARD
+iptables -t nat -A KUBEOPENVPNPORTFORWARD -j ACCEPT
+
 iptables -t nat -A PREROUTING -j KUBEOPENVPNPORTFORWARD
 
 while true; do
