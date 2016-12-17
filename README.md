@@ -1,4 +1,4 @@
-kubernetes-openvpn
+kube-openvpn
 ==================
 
 [![Docker Repository on Quay](https://quay.io/repository/plange/openvpn/status "Docker Repository on Quay")](https://quay.io/repository/plange/openvpn)
@@ -13,13 +13,13 @@ The main motivator for this project was having the ability to route service requ
 ## Usage
 First, you need to initialize your PKI infrastructure. Easyrsa is bundled in this container, so this is fairly easy. Replace `OVPN_SERVER_URL` with your endpoint to-be.
 ```
-$ docker run -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn -ti ptlange/openvpn ovpn_initpki
+$ docker run --user=$(id -u) -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn -ti ptlange/openvpn ovpn_initpki
 ```
 Follow the instructions on screen. Remember (or better: securely store) your secure password for the CA. You are now left with a `pki` folder in your current working directory.
 
 Generate the initial Certificate Revocation List. This file needs to be updated every `$EASYRSA_CRL_DAYS`. All clients will be blocked when this file expires.
 ```
-$ docker run -e EASYRSA_CRL_DAYS=180 -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa gen-crl
+$ docker run --user=$(id -u) -e EASYRSA_CRL_DAYS=180 -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa gen-crl
 ```
 
 Deploy the VPN server (namespace needs to exist already):
@@ -47,8 +47,8 @@ With the pki still in `$PWD/pki` we can create a new VPN user and grab the `.ovp
 
 ```
 # Generate VPN client credentials for CLIENTNAME without password protection; leave 'nopass' out to enter password
-$ docker run -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa build-client-full CLIENTNAME nopass
-$ docker run -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn --rm ptlange/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
+$ docker run --user=$(id -u) -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa build-client-full CLIENTNAME nopass
+$ docker run --user=$(id -u)-e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn --rm ptlange/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
 ```
 
 `CLIENTNAME.ovpn` can now be used to connect to the cluster and interact with k8s services and pods directly. Whoohoo!
@@ -76,7 +76,7 @@ $ kubectl edit configmap openvpn-portmapping
 You can now reach the openvpn client! If you want to substitute a kubernetes service for a service running on the client, simply modify the label selector to match your openvpn endpoint address and the `targetPort` just configured in the openvpn-portmapping configmap.
 
 Exampe service definition routing service `myapp` on port 80 to the `example` client's service running on port 80.
-```
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -87,6 +87,20 @@ spec:
     targetPort: 20080
   selector:
     openvpn: vpn.my.fqdn
+```
+
+## Custom openvpn configuration
+User-specific settings need to be set in the client config directory by editing the `openvpn-ccd` ConfigMap
+
+You can also use your own openvpn configuration by mounting in a `openvpn.tmpl` file in `/etc/openvpn/templates/`. Create your own `openvpn.tmpl` from the example in this repository. Load it into a configmap with `kubectl create configmap openvpn-template --from-file=openvpn.tmpl`. Now edit the openvpn deployment configuration and add in an extra mountpoint at `/etc/openvpn/templates` for the `openvpn-template` configmap.
+
+Note that you can use environment variables in the template!
+
+## Updating the CRL
+Use the `crl-update.sh` script. This extends the CRL for another 182 days by default. If you automate this i recommend setting this far shorter.
+
+```
+$ ./kube/update-crl default
 ```
 
 ## Tests
