@@ -5,8 +5,6 @@ while true; do
     if [ -d $OVPN_CCD ]; then
 
         if [ -d $OVPN_PORTMAPPING ]; then
-            inotifywait -e modify -e create -e delete $OVPN_PORTMAPPING
-
             # Flush any old rules.
             iptables -t nat -F
             for port in $(ls -1 ${OVPN_PORTMAPPING}); do
@@ -20,6 +18,9 @@ while true; do
                     echo "ERROR: client configuration for ${dest_cname} not found"
                 fi
             done
+
+            # Done. Block for updates to configmap.
+            inotifywait -e modify -e create -e delete $OVPN_PORTMAPPING
         else
             # Watch $OPENVPN directory for portmapping directory creation
             inotifywait -e create -qq $OPENVPN
