@@ -61,9 +61,9 @@ data:
 ---
 EOCONFIGMAP
 
-kubectl create --namespace=$namespace -f configmaps-example.yaml
+kubectl create --namespace=$namespace -f ./kube/configmaps-example.yaml
 
-kubectl create --namespace=$namespace -f deployment.yaml
+kubectl create --namespace=$namespace -f ./kube/deployment.yaml
 
 kubectl create --namespace=$namespace -f - <<- EOSERVICE
 ---
