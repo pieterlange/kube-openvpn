@@ -9,9 +9,6 @@ cert ${EASYRSA_PKI}/certificate.crt
 dh ${EASYRSA_PKI}/dh.pem
 tls-auth ${EASYRSA_PKI}/ta.key
 
-# Filled by ConfigMap, update with update-crl.sh
-crl-verify /etc/openvpn/crl/crl.pem
-
 key-direction 0
 keepalive 10 60
 persist-key

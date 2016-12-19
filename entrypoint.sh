@@ -70,14 +70,9 @@ if [ ! -c /dev/net/tun ]; then
     mknod /dev/net/tun c 10 200
 fi
 
-# Use a hacky hardlink as the CRL Needs to be readable by the user/group
-# OpenVPN is running as.  Only pass arguments to OpenVPN if it's found.
-if [ -r "$EASYRSA_PKI/crl.pem" ]; then
-    if [ ! -r "$OPENVPN/crl.pem" ]; then
-        ln "$EASYRSA_PKI/crl.pem" "$OPENVPN/crl.pem"
-        chmod 644 "$OPENVPN/crl.pem"
-    fi
-    addArg "--crl-verify" "$OPENVPN/crl.pem"
+# Load CRL if it is readable (remember to set defaultMode: 555 (ugo+rx) on the volume)
+if [ -r $OVPN_CRL ]; then
+    addArg "--crl-verify" "$OVPN_CRL"
 fi
 
 if [ $DEBUG ]; then

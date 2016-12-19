@@ -1,0 +1,71 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: openvpn
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        openvpn: ${OVPN_CN}
+    spec:
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: openvpn
+        image: ptlange/openvpn:latest
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        volumeMounts:
+        - mountPath: /etc/openvpn/pki
+          name: openvpn-pki
+        - mountPath: /etc/openvpn/crl
+          name: openvpn-crl
+        - mountPath: /etc/openvpn/ccd
+          name: openvpn-ccd
+        - mountPath: /etc/openvpn/portmapping
+          name: openvpn-portmapping
+        env:
+        - name: PODIPADDR
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: OVPN_SERVER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: openvpn-settings
+              key: serverurl
+        - name: OVPN_K8S_SERVICE_NETWORK
+          valueFrom:
+            configMapKeyRef:
+              name: openvpn-settings
+              key: servicecidr
+        - name: OVPN_K8S_POD_NETWORK
+          valueFrom:
+            configMapKeyRef:
+              name: openvpn-settings
+              key: podcidr
+      volumes:
+      - name: openvpn-pki
+        secret:
+          secretName: openvpn-pki
+      - name: openvpn-ccd
+        configMap:
+          name: openvpn-ccd
+      - name: openvpn-crl
+        configMap:
+          defaultMode: 555
+          name: openvpn-crl
+      - name: openvpn-portmapping
+        configMap:
+          name: openvpn-portmapping
