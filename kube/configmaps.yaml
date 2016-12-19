@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openvpn-ccd
+data:
+  example: "ifconfig-push 10.140.0.5 255.255.255.0"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openvpn-portmapping
+data:
+  20080: "example:80"
+---
