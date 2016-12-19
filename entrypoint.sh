@@ -75,6 +75,11 @@ if [ -r $OVPN_CRL ]; then
     addArg "--crl-verify" "$OVPN_CRL"
 fi
 
+# Optional OTP authentication support
+if [ -n "${OVPN_OTP_AUTH:-}" ]; then
+    addArg "--plugin" "/usr/lib/openvpn/plugins/openvpn-plugin-auth-pam.so" "openvpn"
+fi
+
 if [ $DEBUG ]; then
     echo "openvpn.conf:"
     cat $OVPN_CONFIG
