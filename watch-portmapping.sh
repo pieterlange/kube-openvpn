@@ -10,7 +10,6 @@ while true; do
         if [ -d $OVPN_PORTMAPPING ]; then
             # Flush any old NAT rules.
             iptables -t nat -F KUBEOPENVPNPORTFORWARD
-            iptables -t nat -A KUBEOPENVPNPORTFORWARD -j ACCEPT
 
             for port in $(ls -1 ${OVPN_PORTMAPPING}); do
                 dest_cname=$(cut -d':' -f1 ${OVPN_PORTMAPPING}/${port})
