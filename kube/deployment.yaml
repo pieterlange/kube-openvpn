@@ -64,6 +64,7 @@ spec:
           name: openvpn-ccd
       - name: openvpn-crl
         configMap:
+          defaultMode: 555
           name: openvpn-crl
       - name: openvpn-portmapping
         configMap:
