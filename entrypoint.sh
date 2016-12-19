@@ -76,7 +76,7 @@ if [ -r $OVPN_CRL ]; then
 fi
 
 # Optional OTP authentication support
-if [ -n "${OVPN_OTP_AUTH:-}" ]; then
+if [ -d "${OVPN_OTP_AUTH:-}" ]; then
     addArg "--plugin" "/usr/lib/openvpn/plugins/openvpn-plugin-auth-pam.so" "openvpn"
 fi
 
