@@ -32,7 +32,7 @@ else
     base64="base64"
 fi
 
-kubectl create --namespace=$namespace -f - <<- EOSECRETS
+kubectl apply --namespace=$namespace -f - <<- EOSECRETS
 apiVersion: v1
 kind: Secret
 metadata:
@@ -49,7 +49,7 @@ EOSECRETS
 
 kubectl create configmap --namespace=$namespace openvpn-crl --from-file=crl.pem=$PWD/pki/crl.pem
 
-kubectl create --namespace=$namespace -f - <<- EOCONFIGMAP
+kubectl apply --namespace=$namespace -f - <<- EOCONFIGMAP
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -61,11 +61,11 @@ data:
 ---
 EOCONFIGMAP
 
-kubectl create --namespace=$namespace -f ./kube/configmaps-example.yaml
+kubectl apply --namespace=$namespace -f ./kube/configmaps-example.yaml
 
-kubectl create --namespace=$namespace -f ./kube/deployment.yaml
+sed "s/\${OVPN_CN}/${OVPN_CN}/g;" kube/deployment.yaml | kubectl create --namespace=$namespace -f -
 
-kubectl create --namespace=$namespace -f - <<- EOSERVICE
+kubectl apply --namespace=$namespace -f - <<- EOSERVICE
 ---
 apiVersion: v1
 kind: Service
