@@ -10,3 +10,4 @@
 * OVPN_K8S_DNS - The DNS resolver pushed to clients. (Default: resolver used in openvpn pod itself)
 * OVPN_VERB - The verbosity of openvpn logs. (Default: `3`)
 * OVPN_DEFROUTE - Whether to allow clients to route traffic other than pod/service networks. Set to `1` to allow, set to `2` to push a default route to clients. (Default: `0`)
+* DEBUG - Set this variable to any value to print each command executed and set `OVPN_DEBUG` to `5`.
