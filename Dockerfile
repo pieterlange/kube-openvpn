@@ -5,7 +5,7 @@ MAINTAINER Pieter Lange <pieter@ptlc.nl>
 
 RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
     echo "http://dl-4.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
-    apk add --update openvpn iptables bash easy-rsa libintl inotify-tools && \
+    apk add --update openvpn iptables bash easy-rsa libintl inotify-tools openvpn-auth-pam google-authenticator pamtester && \
     apk add --virtual build_deps gettext &&  \
     cp /usr/bin/envsubst /usr/local/bin/envsubst && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin && \
@@ -33,5 +33,8 @@ RUN chmod a+x /usr/local/bin/*
 COPY entrypoint.sh /sbin/entrypoint.sh
 COPY watch-portmapping.sh /sbin/watch-portmapping.sh
 COPY openvpn.tmpl $OVPN_TEMPLATE
+
+# Add support for OTP authentication using a PAM module
+ADD ./otp/openvpn /etc/pam.d/
 
 CMD ["/sbin/entrypoint.sh"]
