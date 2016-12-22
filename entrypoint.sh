@@ -52,6 +52,7 @@ envsubst < $OVPN_TEMPLATE > $OVPN_CONFIG
 
 if [ $OVPN_DEFROUTE -gt 0 ]; then
     iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
+    [ $OVPN_DEFROUTE -gt 1 ] && addArg "--push" "redirect-gateway def1"
 else
     iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $OVPN_K8S_POD_NETWORK -o ${OVPN_NATDEVICE} -j MASQUERADE
     iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $OVPN_K8S_SERVICE_NETWORK -o ${OVPN_NATDEVICE} -j MASQUERADE
