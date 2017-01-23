@@ -16,6 +16,9 @@ persist-tun
 push block-outside-dns
 
 proto ${OVPN_PROTO}
+cipher ${OVPN_CIPHER}
+tls-cipher ${OVPN_TLS_CIPHER}
+
 # Rely on scheduler to do port mapping, internally always 1194
 port 1194
 dev tun0
