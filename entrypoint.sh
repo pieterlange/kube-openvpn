@@ -56,6 +56,13 @@ if [ $OVPN_DEFROUTE -gt 0 ]; then
 else
     iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $OVPN_K8S_POD_NETWORK -o ${OVPN_NATDEVICE} -j MASQUERADE
     iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $OVPN_K8S_SERVICE_NETWORK -o ${OVPN_NATDEVICE} -j MASQUERADE
+    if [ -n $OVPN_EXTRA_ROUTES ]; then
+        IFS=',' read -r -a $extra_routes <<< "$OVPN_EXTRA_ROUTES"
+        for route in "${extra_routes[@]}"; do
+            iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $route -o ${OVPN_NATDEVICE} -j MASQUERADE
+            addArg "--push" "route ${route}"
+        done
+    fi
 fi
 
 # Use client configuration directory if it exists.
