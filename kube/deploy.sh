@@ -72,7 +72,7 @@ kind: Service
 metadata:
   labels:
     openvpn: ${OVPN_CN}
-  name: openvpn-ingress
+  name: openvpn
 spec:
   type: NodePort
   ports:
