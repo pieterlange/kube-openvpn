@@ -40,7 +40,7 @@ See http://releases.k8s.io/release-1.3/docs/user-guide/services-firewalls.md for
 service "openvpn-ingress" created
 ```
 
-Your VPN endpoint is now reachable on every node in the cluster on port 30XXX. A cloud loadbalancer should be manually configured to route `vpn.my.fqdn:1194` to all nodes on port 30xxx.
+Your VPN endpoint is now reachable on every node in the cluster on port 30XXX. This port can be easily exposed by setting the `Type` field of the openvpn Service to `LoadBalancer` if you're running your cluster within a public cloud. Assign the correct `CNAME`/`A` address to your loadbalancer or replace the original servername with the DNS name of your newly created loadbalancer in your client configuration.
 
 ## Accessing the cluster
 With the pki still in `$PWD/pki` we can create a new VPN user and grab the `.ovpn` configuration file:

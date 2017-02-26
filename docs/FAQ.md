@@ -27,3 +27,16 @@ Make sure you're not already using `10.140.0.0/24` in your architecture. If you 
 
 ### I want to route all traffic through the VPN
 Set `$OVPN_DEFROUTE` to a value of `1` on the kubernetes pod to enable VPN clients to route to other networks than the kubernetes pod/service networks. Set `$OVPN_DEFROUTE` to `2` to also push this configuration to the openvpn clients.
+
+### Revoking clients
+This works just like any other PKI system. If you followed the setup instructions, you're using easyrsa and client revocation is done as follows.
+
+Revoke the client (where <CN> is the client name):
+```
+docker run --user=$(id -u) -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa revoke <CN>
+```
+
+Now update the CRL on the cluster:
+```
+./kube/update-crl.sh <namespace> [#days the CRL is valid]
+```
