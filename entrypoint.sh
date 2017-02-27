@@ -50,19 +50,26 @@ OVPN_K8S_POD_NETWORK_ROUTE=$(getroute $OVPN_K8S_POD_NETWORK)
 
 envsubst < $OVPN_TEMPLATE > $OVPN_CONFIG
 
+IFS=',' read -r -a routes <<< "$OVPN_ROUTES"
+routes+=("$OVPN_K8S_SERVICE_NETWORK" "$OVPN_K8S_POD_NETWORK")
+
+for route in "${routes[@]}"; do
+    if [[ "$route" =~ ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$ ]]; then
+        network_route=$(getroute $route)
+        addArg "--push" "route ${network_route}"
+    else
+        echo "$(date "+%a %b %d %H:%M:%S %Y") Dropping invalid route '${route}'."
+        routes=("${routes[@]/$route}" )
+    fi
+done
+
 if [ $OVPN_DEFROUTE -gt 0 ]; then
     iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
     [ $OVPN_DEFROUTE -gt 1 ] && addArg "--push" "redirect-gateway def1"
 else
-    iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $OVPN_K8S_POD_NETWORK -o ${OVPN_NATDEVICE} -j MASQUERADE
-    iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $OVPN_K8S_SERVICE_NETWORK -o ${OVPN_NATDEVICE} -j MASQUERADE
-    if [ -n $OVPN_EXTRA_ROUTES ]; then
-        IFS=',' read -r -a $extra_routes <<< "$OVPN_EXTRA_ROUTES"
-        for route in "${extra_routes[@]}"; do
-            iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $route -o ${OVPN_NATDEVICE} -j MASQUERADE
-            addArg "--push" "route ${route}"
-        done
-    fi
+    for route in "${routes[@]}"; do
+        iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $route -o ${OVPN_NATDEVICE} -j MASQUERADE
+    done
 fi
 
 # Use client configuration directory if it exists.
