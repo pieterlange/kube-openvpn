@@ -93,6 +93,7 @@ fi
 # Optional OTP authentication support
 if [ -d "${OVPN_OTP_AUTH:-}" ]; then
     addArg "--plugin" "/usr/lib/openvpn/plugins/openvpn-plugin-auth-pam.so" "openvpn"
+    addArg "--reneg-sec" "0"
 fi
 
 if [ $DEBUG ]; then
