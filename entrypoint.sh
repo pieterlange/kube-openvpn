@@ -64,11 +64,11 @@ for route in "${routes[@]}"; do
 done
 
 if [ $OVPN_DEFROUTE -gt 0 ]; then
-    iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -o ${OVPN_NATDEVICE} -j SNAT --to-source $PODIPADDR
     [ $OVPN_DEFROUTE -gt 1 ] && addArg "--push" "redirect-gateway def1"
 else
     for route in "${routes[@]}"; do
-        iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $route -o ${OVPN_NATDEVICE} -j MASQUERADE
+        iptables -t nat -A POSTROUTING -s ${OVPN_NETWORK} -d $route -o ${OVPN_NATDEVICE} -j SNAT --to-source $PODIPADDR
     done
 fi
 
