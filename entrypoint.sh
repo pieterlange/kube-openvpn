@@ -96,6 +96,10 @@ if [ -d "${OVPN_OTP_AUTH:-}" ]; then
     addArg "--reneg-sec" "0"
 fi
 
+if [ -n "${OVPN_MANAGEMENT_PORT}" ]; then
+    addArg "--management" "127.0.0.1 ${OVPN_MANAGEMENT_PORT}"
+fi
+
 if [ $DEBUG ]; then
     echo "openvpn.conf:"
     cat $OVPN_CONFIG
