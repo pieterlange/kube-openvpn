@@ -22,7 +22,23 @@ Generate the initial Certificate Revocation List. This file needs to be updated 
 $ docker run --user=$(id -u) -e EASYRSA_CRL_DAYS=180 -v $PWD:/etc/openvpn -ti ptlange/openvpn easyrsa gen-crl
 ```
 
+
+Getting service_cidr and pod_cidr within google cloud:
+
+service_cidr:
+
+```
+gcloud container clusters describe <your clustername> | grep servicesIpv4Cidr
+```
+
+pod_cidr:
+
+```
+gcloud container clusters describe <your clustername> | grep clusterIpv4Cidr
+```
+
 Deploy the VPN server (namespace needs to exist already):
+
 ```
 $ ./kube/deploy.sh
 Usage: ./kube/deploy.sh <namespace> <OpenVPN URL> <service cidr> <pod cidr>
