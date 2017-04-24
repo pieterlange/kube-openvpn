@@ -33,8 +33,7 @@ ADD ./bin /usr/local/bin
 RUN chmod a+x /usr/local/bin/*
 
 # Initialisation scripts and default template
-COPY entrypoint.sh /sbin/entrypoint.sh
-COPY watch-portmapping.sh /sbin/watch-portmapping.sh
+COPY *.sh /sbin/
 COPY openvpn.tmpl $OVPN_TEMPLATE
 
 # Add support for OTP authentication using a PAM module

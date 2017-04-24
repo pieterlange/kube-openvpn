@@ -100,10 +100,15 @@ if [ -n "${OVPN_MANAGEMENT_PORT}" ]; then
     addArg "--management" "127.0.0.1 ${OVPN_MANAGEMENT_PORT}"
 fi
 
+if [ -n "${OVPN_STATUS}" ]; then
+    addArg "--status" "${OVPN_STATUS}"
+    /sbin/print-status.sh ${OVPN_STATUS} &
+fi
+
 if [ $DEBUG ]; then
     echo "openvpn.conf:"
     cat $OVPN_CONFIG
 fi
 
 echo "$(date "+%a %b %d %H:%M:%S %Y") Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
-exec openvpn ${ARGS[@]} ${USER_ARGS[@]}
+exec openvpn ${ARGS[@]} ${USER_ARGS[@]} 1> /dev/stderr 2> /dev/stderr
