@@ -32,7 +32,12 @@ else
     base64="base64"
 fi
 
-kubectl apply --namespace=$namespace -f - <<- EOSECRETS
+kuberes='./kube/kube-resources'
+mkdir $kuberes
+
+echo "Generating Kubernetes ressources"
+
+cat << EOSECRETS > $kuberes/openvpn-pki.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -47,9 +52,7 @@ data:
 ---
 EOSECRETS
 
-kubectl create configmap --namespace=$namespace openvpn-crl --from-file=crl.pem=$PWD/pki/crl.pem
-
-kubectl apply --namespace=$namespace -f - <<- EOCONFIGMAP
+cat << EOCONFIGMAP > $kuberes/openvpn-settings.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -61,11 +64,7 @@ data:
 ---
 EOCONFIGMAP
 
-kubectl apply --namespace=$namespace -f ./kube/configmaps-example.yaml
-
-sed "s/\${OVPN_CN}/${OVPN_CN}/g;" kube/deployment.yaml | kubectl create --namespace=$namespace -f -
-
-kubectl apply --namespace=$namespace -f - <<- EOSERVICE
+cat << EOSERVICE > $kuberes/openvpn-svc.yaml
 ---
 apiVersion: v1
 kind: Service
@@ -83,3 +82,11 @@ spec:
     openvpn: ${OVPN_CN}
 ---
 EOSERVICE
+
+echo "Creating and applying Kubernetes ressources"
+kubectl create configmap --namespace=$namespace openvpn-crl --from-file=crl.pem=$PWD/pki/crl.pem
+kubectl apply --namespace=$namespace -f ./kube/configmaps-example.yaml
+kubectl apply --namespace=$namespace -f $kuberes/openvpn-pki.yaml
+kubectl apply --namespace=$namespace -f $kuberes/openvpn-settings.yaml
+kubectl apply --namespace=$namespace -f $kuberes/openvpn-svc.yaml
+sed "s/\${OVPN_CN}/${OVPN_CN}/g;" kube/deployment.yaml | kubectl create --namespace=$namespace -f -
