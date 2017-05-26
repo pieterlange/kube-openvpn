@@ -55,8 +55,7 @@ routes+=("$OVPN_K8S_SERVICE_NETWORK" "$OVPN_K8S_POD_NETWORK")
 
 for route in "${routes[@]}"; do
     if [[ "$route" =~ ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$ ]]; then
-        network_route=$(getroute $route)
-        addArg "--push" "route ${network_route}"
+        addArg "--push" "route $(getroute $route)"
     else
         echo "$(date "+%a %b %d %H:%M:%S %Y") Dropping invalid route '${route}'."
         routes=("${routes[@]/$route}" )
@@ -97,7 +96,7 @@ if [ -d "${OVPN_OTP_AUTH:-}" ]; then
 fi
 
 if [ -n "${OVPN_MANAGEMENT_PORT}" ]; then
-    addArg "--management" "127.0.0.1 ${OVPN_MANAGEMENT_PORT}"
+    addArg "--management" "127.0.0.1" "${OVPN_MANAGEMENT_PORT}"
 fi
 
 if [ -n "${OVPN_STATUS}" ]; then
@@ -111,4 +110,4 @@ if [ $DEBUG ]; then
 fi
 
 echo "$(date "+%a %b %d %H:%M:%S %Y") Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
-exec openvpn ${ARGS[@]} ${USER_ARGS[@]} 1> /dev/stderr 2> /dev/stderr
+exec openvpn "${ARGS[@]} ${USER_ARGS[@]}" 1> /dev/stderr 2> /dev/stderr

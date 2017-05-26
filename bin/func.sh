@@ -16,10 +16,14 @@ function hasArg {
 # Adds the given argument if it's not already specified.
 function addArg {
     local arg="${1}"
-    [ $# -ge 1 ] && local val="${2}"
+    shift
     if ! hasArg "${arg}" "${USER_ARGS[@]}"; then
         ARGS+=("${arg}")
-        [ $# -ge 1 ] && ARGS+=("${val}")
+        if [ $# -ge 1 ]; then
+            for val in "$@"; do
+              ARGS+=("${val}")
+            done
+        fi
     fi
 }
 
