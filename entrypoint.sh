@@ -110,4 +110,4 @@ if [ $DEBUG ]; then
 fi
 
 echo "$(date "+%a %b %d %H:%M:%S %Y") Running 'openvpn ${ARGS[@]} ${USER_ARGS[@]}'"
-exec openvpn "${ARGS[@]} ${USER_ARGS[@]}" 1> /dev/stderr 2> /dev/stderr
+exec openvpn "${ARGS[@]}" "${USER_ARGS[@]}" 1> /dev/stderr 2> /dev/stderr
