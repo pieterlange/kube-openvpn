@@ -5,7 +5,8 @@ MAINTAINER Pieter Lange <pieter@ptlc.nl>
 
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
     echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
-    apk add --update openvpn bash easy-rsa libintl inotify-tools openvpn-auth-pam google-authenticator pamtester && \
+    apk add --update openvpn=2.4.3-r0 \
+      bash easy-rsa libintl inotify-tools openvpn-auth-pam google-authenticator pamtester && \
     apk add --virtual temppkg gettext &&  \
     cp /usr/bin/envsubst /usr/local/bin/envsubst && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin && \
