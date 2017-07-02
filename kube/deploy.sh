@@ -26,7 +26,9 @@ if [ ! -d pki ]; then
     exit 1
 fi
 
-if [ $(uname -s) == "Linux" ]; then
+# test if -w0 is a valid option
+base64 -w0 /dev/null > /dev/null 2>&1
+if [ $? -eq 0 ]; then
     base64="base64 -w0"
 else
     base64="base64"
