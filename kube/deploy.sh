@@ -8,7 +8,7 @@ servicecidr=$3
 podcidr=$4
 
 # Server name is in the form "udp://vpn.example.com:1194"
-if [[ "$serverurl" =~ ^((udp|tcp)://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
+if [[ "$serverurl" =~ ^((udp|tcp)(4|6)?://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
     OVPN_PROTO=$(echo ${BASH_REMATCH[2]} | tr '[:lower:]' '[:upper:]')
     OVPN_CN=$(echo ${BASH_REMATCH[3]} | tr '[:upper:]' '[:lower:]')
     OVPN_PORT=${BASH_REMATCH[5]};
@@ -37,7 +37,7 @@ fi
 kuberes='./kube/kube-resources'
 mkdir $kuberes
 
-echo "Generating Kubernetes ressources"
+echo "Generating Kubernetes resources"
 
 cat << EOSECRETS > $kuberes/openvpn-pki.yaml
 apiVersion: v1
@@ -85,7 +85,7 @@ spec:
 ---
 EOSERVICE
 
-echo "Creating and applying Kubernetes ressources"
+echo "Creating and applying Kubernetes resources"
 kubectl create configmap --namespace=$namespace openvpn-crl --from-file=crl.pem=$PWD/pki/crl.pem
 kubectl apply --namespace=$namespace -f ./kube/configmaps-example.yaml
 kubectl apply --namespace=$namespace -f $kuberes/openvpn-pki.yaml
