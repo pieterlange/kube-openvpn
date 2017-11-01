@@ -35,7 +35,7 @@ else
 fi
 
 kuberes='./kube/kube-resources'
-mkdir $kuberes
+mkdir -p $kuberes
 
 echo "Generating Kubernetes resources"
 
