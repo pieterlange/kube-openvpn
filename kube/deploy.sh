@@ -10,8 +10,8 @@ podcidr=$4
 # Server name is in the form "udp://vpn.example.com:1194"
 if [[ "$serverurl" =~ ^((udp|tcp)(4|6)?://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
     OVPN_PROTO=$(echo ${BASH_REMATCH[2]} | tr '[:lower:]' '[:upper:]')
-    OVPN_CN=$(echo ${BASH_REMATCH[3]} | tr '[:upper:]' '[:lower:]')
-    OVPN_PORT=${BASH_REMATCH[5]};
+    OVPN_CN=$(echo ${BASH_REMATCH[4]} | tr '[:upper:]' '[:lower:]')
+    OVPN_PORT=${BASH_REMATCH[6]};
 else
     echo "Need to pass in OpenVPN URL in 'proto://fqdn:port' format"
     echo "eg: tcp://my.fully.qualified.domain.com:1194"

@@ -10,8 +10,8 @@ addArg "--config" "$OVPN_CONFIG"
 # Server name is in the form "udp://vpn.example.com:1194"
 if [[ "$OVPN_SERVER_URL" =~ ^((udp|tcp)(4|6)?://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
     OVPN_PROTO=${BASH_REMATCH[2]};
-    OVPN_CN=${BASH_REMATCH[3]};
-    OVPN_PORT=${BASH_REMATCH[5]};
+    OVPN_CN=${BASH_REMATCH[4]};
+    OVPN_PORT=${BASH_REMATCH[6]};
 else
     echo "Need to pass in OVPN_SERVER_URL in 'proto://fqdn:port' format"
     exit 1
