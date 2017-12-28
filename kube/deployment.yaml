@@ -59,6 +59,7 @@ spec:
       - name: openvpn-pki
         secret:
           secretName: openvpn-pki
+          defaultMode: 0400
       - name: openvpn-ccd
         configMap:
           name: openvpn-ccd
