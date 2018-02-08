@@ -55,6 +55,11 @@ spec:
             configMapKeyRef:
               name: openvpn-settings
               key: podcidr
+        - name: OVPN_K8S_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: openvpn-settings
+              key: domain
       volumes:
       - name: openvpn-pki
         secret:
