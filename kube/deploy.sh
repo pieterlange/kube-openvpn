@@ -6,7 +6,7 @@ namespace=$1
 serverurl=$2
 servicecidr=$3
 podcidr=$4
-domain=$5
+domain=${5:-svc.cluster.local}
 
 # Server name is in the form "udp://vpn.example.com:1194"
 if [[ "$serverurl" =~ ^((udp|tcp)(4|6)?://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
