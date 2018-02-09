@@ -1,11 +1,12 @@
 #!/bin/bash
 
-[ -z $4 ] && echo "Usage: $0 <namespace> <OpenVPN URL> <service cidr> <pod cidr>" && exit 1
+[ -z $5 ] && echo "Usage: $0 <namespace> <OpenVPN URL> <service cidr> <pod cidr> <cluster domain>" && exit 1
 
 namespace=$1
 serverurl=$2
 servicecidr=$3
 podcidr=$4
+domain=${5:-svc.cluster.local}
 
 # Server name is in the form "udp://vpn.example.com:1194"
 if [[ "$serverurl" =~ ^((udp|tcp)(4|6)?://)?([0-9a-zA-Z\.\-]+)(:([0-9]+))?$ ]]; then
@@ -63,6 +64,7 @@ data:
   servicecidr: "${servicecidr}"
   podcidr: "${podcidr}"
   serverurl: "${serverurl}"
+  domain: "${domain}"
 ---
 EOCONFIGMAP
 
