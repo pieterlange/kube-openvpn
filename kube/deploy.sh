@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ -z $5 ] && echo "Usage: $0 <namespace> <OpenVPN URL> <service cidr> <pod cidr> <cluster domain>" && exit 1
+[ -z $4 ] && echo "Usage: $0 <namespace> <OpenVPN URL> <service cidr> <pod cidr> <cluster domain>" && exit 1
 
 namespace=$1
 serverurl=$2
