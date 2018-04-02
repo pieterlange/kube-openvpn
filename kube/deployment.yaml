@@ -14,7 +14,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
       - name: openvpn
-        image: ptlange/openvpn:latest
+        image: quay.io/plange/openvpn:latest
         securityContext:
           capabilities:
             add:
@@ -35,6 +35,11 @@ spec:
           name: openvpn-ccd
         - mountPath: /etc/openvpn/portmapping
           name: openvpn-portmapping
+        - mountPath: /etc/openvpn/status
+          name: openvpn-status
+        ports:
+        - name: openvpn
+          containerPort: 1194
         env:
         - name: PODIPADDR
           valueFrom:
@@ -60,6 +65,14 @@ spec:
             configMapKeyRef:
               name: openvpn-settings
               key: domain
+      - name: metrics
+        image: quay.io/plange/openvpn_exporter:latest
+        ports:
+        - name: openvpn
+          containerPort: 9176
+        volumeMounts:
+        - mountPath: /etc/openvpn_exporter/
+          name: openvpn-status
       volumes:
       - name: openvpn-pki
         secret:
@@ -75,3 +88,5 @@ spec:
       - name: openvpn-portmapping
         configMap:
           name: openvpn-portmapping
+      - name: openvpn-status
+        emptyDir: {}

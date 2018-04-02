@@ -22,6 +22,8 @@ OVPN_PROTO="${OVPN_PROTO:-tcp}"
 OVPN_NATDEVICE="${OVPN_NATDEVICE:-eth0}"
 OVPN_K8S_DOMAIN="${OVPN_K8S_DOMAIN:-svc.cluster.local}"
 OVPN_VERB=${OVPN_VERB:-3}
+OVPN_STATUS="${OVPN_STATUS:-${OPENVPN}/status/server.status}"
+OVPN_STATUS_VERSION=${OVPN_STATUS_VERSION:-2}
 
 if [ ! -d "${EASYRSA_PKI}" ]; then
     echo "PKI directory missing. Did you mount in your Secret?"
@@ -101,7 +103,7 @@ fi
 
 if [ -n "${OVPN_STATUS}" ]; then
     addArg "--status" "${OVPN_STATUS}"
-    /sbin/print-status.sh ${OVPN_STATUS} &
+    addArg "--status-version" "${OVPN_STATUS_VERSION}"
 fi
 
 if [ $DEBUG ]; then
