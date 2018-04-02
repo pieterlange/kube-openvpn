@@ -9,6 +9,9 @@ spec:
     metadata:
       labels:
         openvpn: ${OVPN_CN}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9176"
     spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 60
@@ -65,6 +68,11 @@ spec:
             configMapKeyRef:
               name: openvpn-settings
               key: domain
+        - name: OVPN_STATUS
+          valueFrom:
+            configMapKeyRef:
+              name: openvpn-settings
+              key: statusfile
       - name: metrics
         image: quay.io/plange/openvpn_exporter:latest
         ports:
