@@ -65,6 +65,7 @@ data:
   podcidr: "${podcidr}"
   serverurl: "${serverurl}"
   domain: "${domain}"
+  statusfile: "/etc/openvpn/status/server.status"
 ---
 EOCONFIGMAP
 
