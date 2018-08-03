@@ -96,6 +96,11 @@ $OVPN_ADDITIONAL_CLIENT_CONFIG
     if [ -n "$OVPN_COMP_LZO" ]; then
         echo "comp-lzo"
     fi
+    if [ -n "$OVPN_CLIENT_PROXY" ]; then
+        OVPN_CLIENT_PROXY_PORT="${OVPN_CLIENT_PROXY_PORT:-3128}"
+        echo "http-proxy ${OVPN_CLIENT_PROXY} ${OVPN_CLIENT_PROXY_PORT}"
+        echo "http-proxy-retry"
+    fi
 }
 
 dir="$OPENVPN/clients/$cn"
