@@ -51,7 +51,6 @@ data:
   ca.crt: "$($base64 pki/ca.crt)"
   certificate.crt: "$($base64 pki/issued/${OVPN_CN}.crt)"
   dh.pem: "$($base64 pki/dh.pem)"
-  ta.key: "$($base64 pki/ta.key)"
 ---
 EOSECRETS
 
