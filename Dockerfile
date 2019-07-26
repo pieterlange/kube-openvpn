@@ -1,5 +1,4 @@
-# Smallest base image
-FROM alpine:3.9
+FROM alpine:3.10
 
 MAINTAINER Pieter Lange <pieter@ptlc.nl>
 
