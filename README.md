@@ -72,7 +72,7 @@ $ docker run --user=$(id -u) -e OVPN_SERVER_URL=tcp://vpn.my.fqdn:1194 -v $PWD:/
 ![One-way traffic](kube/routing1.png "Direct access to kubernetes services")
 
 
-## Routing back to the client
+## Routing back to the client via port forward
 
 In order to route cluster traffic back to a service running on the client, we need to assign `CLIENTNAME` a static IP. If you have not configured an `$OVPN_NETWORK` you need to pick something in the `10.140.0.0/24` range.
 
@@ -104,6 +104,48 @@ spec:
   selector:
     openvpn: vpn.my.fqdn
 ```
+
+## Routing back to the client via the routing table
+
+It is possible to access the clients in the VPN network from pods running in the cluster, however this requires certain preparations and arises some new problems.
+
+Since pods are capable of accessing each other, if a route is set in the one which wants to access the clients, then traffic will be routed through the VPN server pod into the client network.
+
+Via a service account, it is possible to find out the IP of the VPN server pod, and it can be added as the gateway for the VPN network. This can be achieved by the following startup script:
+
+```bash
+#! /usr/bin/env bash
+
+PORT="6443"
+TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+
+test -z OVPN_NETWORK && OVPN_NETWORK="10.140.0.0/24"
+
+export VPN_IP=$(curl -s
+  --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \ 
+  -H "Authorization: Bearer $TOKEN" \
+  https://kubernetes.default.svc:$PORT/api/v1/namespaces/$NAMESPACE/pods \
+  | jq -r '.items[] | select(.metadata.name | contains("openvpn")) | .status.podIP')
+
+ip route add $OVPN_NETWORK via $VPN_IP
+
+# TODO: invoke original entry point here
+```
+
+The script relies on the following assumptions:
++ The Kubernetes API is exposed through port 6443
++ `curl` & `jq` are installed in the container (and `ip` too, but it's probably pre-installed)
++ The VPN server is in the same namespace as the pod using this script
++ The name of the pod running the server contains the string `"openvpn"`
++ The pod is using a service account with a role capable of listing pods in the current namespace (like [this](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example))
++ If `OVPN_NETWORK` was specified when the server was configured, the same value is expected in the same environmental variable
+
+This approach has one serious limitation: as pods die and respawn, their IP is changing, so the possible restarts of the VPN server must be handled in the pod accessing the clients. The route must be deleted, the new IP must be queried and the route must be recreated with the new IP every time a restart occurs. This can be monitored and implemented many ways. **NOTE: If this is not implemented, connection will be broken until the pod is restarted**
+
+In order to access clients this way, setting static IPs for them is not necessary, but unless manual lookup is implemented, it might be useful.
+
+Unfortunately, the service of the VPN server cannot be used, since it's designed to operate in the Transport Layer, while this solution provides Internet Layer access.
 
 ## Custom openvpn configuration
 User-specific settings need to be set in the client config directory by editing the `openvpn-ccd` ConfigMap
